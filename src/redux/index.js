@@ -1,9 +1,39 @@
 import { combineReducers, createStore } from 'redux';
 
-const firstNamedReducer = (state = 1, action) => state;
-const secondNamedReducer = (state = 2, action) => state;
+const messageList = [];
+for (let i = 0; i < 20; i++) {
+    messageList.push({
+        id:i,
+        imgUrl:"test",
+        name:"user name"+i,
+        content:"message test"+i,
+    });
+}
+
+const todoList = {};
+for(let i=0;i<5;i++) {
+    let today = new Date();
+    let date = new Date(today.getFullYear(),today.getMonth(),today.getDate()+i).toISOString().split("T")[0];
+    let list = [];
+
+    for (let j = 0; j < 20; j++) {
+        list.push({
+            id: j,
+            date: date,
+            name: "todo day " + date + " "+j,
+            content: "content test" + j,
+        });
+    }
+
+    todoList[date] = list;
+}
+
+const messages = (state = messageList, action) => state;
+const todos = (state = todoList, action) => state;
+
 const reducers = combineReducers({
-    firstNamedReducer,
-    secondNamedReducer
+    messages,
+    todos,
 });
+
 export const store = createStore(reducers);
