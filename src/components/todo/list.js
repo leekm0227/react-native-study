@@ -1,29 +1,59 @@
-import React, {useState} from "react";
+import React, {useState, useEffect, useLayoutEffect} from "react";
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {FlatList, View} from 'react-native';
 import {Calendar} from "react-native-calendars";
-import {ListItem} from 'react-native-elements'
+import {Button, CheckBox, ListItem} from 'react-native-elements'
+import icons from "~/components/icons";
 
 
 export default () => {
     const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
-    const list = useSelector(store => store.todos);
-    const [todos, setTodos] = useState(list[today]);
-    const [marked, setMarked] = useState({[today]: {selected: true}});
+    const todoList = useSelector(store => store.todos);
     const navigation = useNavigation();
+    const [selected, setSelected] = useState(today);
+    const [todos, setTodos] = useState([]);
+    const [marked, setMarked] = useState({});
 
-    const changeDay = (date) => {
-        setMarked({[date.dateString]: {selected: true}})
-        setTodos(list[date.dateString])
-    }
+    useEffect(()=>{
+        let marked = {};
+        Object.entries(todoList).map(([key, value]) => {
+            marked[key] = {
+                selected: key === today,
+                marked: value.size !== 0,
+                dotColor: 'green',
+            }
+        });
+
+        setMarked(marked);
+    }, [todos])
+
+    useEffect(() => {
+        setTodos(todoList[selected]);
+    }, [selected]);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Button
+                    icon={icons("Add")}
+                    type="clear"
+                    onPress={() => navigation.navigate("add", today)}/>
+            ),
+        });
+    }, [navigation]);
 
     const renderItem = (props) => {
         return (
-            <ListItem bottomDivider onPress={() => navigation.navigate("detail")}>
+            <ListItem bottomDivider>
+                <CheckBox checked={props.item.isComplete}
+                          onPress={() => setTodos(todos.map(todo => todo.id === props.item.id ? {
+                              ...todo,
+                              isComplete: !todo.isComplete
+                          } : todo))}/>
                 <ListItem.Content>
-                    <ListItem.Title>{props.item.name}</ListItem.Title>
-                    <ListItem.Subtitle>{props.item.content}</ListItem.Subtitle>
+                    <ListItem.Title
+                        style={props.item.isComplete ? {textDecorationLine: 'line-through'} : {}}>{props.item.subject}</ListItem.Title>
                 </ListItem.Content>
             </ListItem>
         )
@@ -33,14 +63,15 @@ export default () => {
         <View>
             <Calendar
                 markedDates={marked}
-                onDayPress={(date) => changeDay(date)}
+                onDayPress={(date) => setSelected(date.dateString)}
                 monthFormat={'yyyy MM'}
-                // firstDay={1}
-                enableSwipeMonths={true}/>
+                enableSwipeMonths={true}
+            />
             <FlatList
                 keyExtractor={(item, index) => index.toString()}
                 data={todos}
-                renderItem={renderItem}/>
+                renderItem={renderItem}
+            />
         </View>
     )
 }

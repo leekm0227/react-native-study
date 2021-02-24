@@ -20,8 +20,8 @@ for(let i=0;i<5;i++) {
         list.push({
             id: j,
             date: date,
-            name: "todo day " + date + " "+j,
-            content: "content test" + j,
+            subject: "todo day " + date + " "+j,
+            isComplete: false,
         });
     }
 
