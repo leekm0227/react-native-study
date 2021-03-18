@@ -3,10 +3,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 const icons = {
-    Home: 'home-outline',
-    Chat: 'chatbubbles-outline',
-    Todo: 'clipboard-outline',
-    Social: 'happpy-outline',
+    Home: 'person-outline',
+    Vote: 'clipboard-outline',
     Add: 'add-outline'
 };
 

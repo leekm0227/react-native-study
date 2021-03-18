@@ -1,7 +1,7 @@
 import React, {useLayoutEffect} from "react";
-import List from "~/components/todo/list"
-import Add from "~/components/todo/add"
-import Detail from "~/components/todo/detail"
+import List from "~/components/vote/list"
+import Add from "~/components/vote/add"
+import Detail from "~/components/vote/detail"
 
 
 export const list = ({navigation}) => (<List/>);

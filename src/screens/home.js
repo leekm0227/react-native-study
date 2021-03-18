@@ -1,5 +1,5 @@
 import React from "react";
-import List from "~/components/chat/list"
+import List from "~/components/home/list"
 
 
 export default () => (

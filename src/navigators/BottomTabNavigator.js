@@ -1,10 +1,8 @@
 import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import TodoStackNavigator from "~/navigators/TodoStackNavigator";
-import ChatStackNavigator from "~/navigators/ChatStackNavigator";
+import VoteStackNavigator from "~/navigators/VoteStackNavigator";
 import icons from "~/components/icons";
 import home from "~/screens/home";
-import social from "~/screens/social";
 
 const Tab = createBottomTabNavigator();
 export default () => (
@@ -20,9 +18,7 @@ export default () => (
             }
         }}
     >
-        <Tab.Screen name="Todo" component={TodoStackNavigator}/>
-        <Tab.Screen name="Social" component={social}/>
-        <Tab.Screen name="Chat" component={ChatStackNavigator}/>
         <Tab.Screen name="Home" component={home}/>
+        <Tab.Screen name="Vote" component={VoteStackNavigator}/>
     </Tab.Navigator>
 )
