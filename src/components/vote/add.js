@@ -1,17 +1,14 @@
 import React, {useState} from "react";
 import {Button, Card, Input, Text} from 'react-native-elements'
-import icons from "~/components/icons";
-import {Alert, View} from "react-native";
+import {Alert, ScrollView, View} from "react-native";
 import axios from "axios";
 import globals from "~/globals"
-import {useSelector} from "react-redux";
 import {useNavigation} from "@react-navigation/native";
 
 
 export default () => {
-    const user = useSelector(store => store.user)
     const navigation = useNavigation();
-    let [vote, setVote] = useState({})
+    let [vote, setVote] = useState({subject: "", content: ""})
     let [voteItems, setVoteItems] = useState([])
     let [item, setItem] = useState("")
 
@@ -53,28 +50,24 @@ export default () => {
     }
 
     const submit = () => {
-        let url = `${globals.API_URL}/votes`
-        axios.post(url, {...vote, voteItems: voteItems}, {headers: {Authorization: user.token}})
-            .then(res => {
-                Alert.alert("success")
-                navigation.goBack()
-            })
-            .catch(err => {
-                console.log(err)
-            })
+        axios.post('/votes', {...vote, voteItems: voteItems}).then(res => {
+            Alert.alert("success")
+            navigation.goBack()
+        }).catch(() => Alert.alert("error"))
     }
 
+
     return (
-        <View style={{flex: 1, justifyContent: "space-between"}}>
+        <ScrollView>
             <Card>
                 <Input label="SUBJECT" onChangeText={(text) => {
                     setVote({...vote, subject: text})
                 }}/>
                 <Card.Divider/>
-                <Input style={{minHeight: 100}}
+                <Input style={{minHeight: 50}}
                        label="CONTENT"
                        multiline={true}
-                       numberOfLines={4}
+                       numberOfLines={2}
                        onChangeText={(text) => setVote({...vote, content: text})}
                 />
                 <Card.Divider/>
@@ -84,7 +77,7 @@ export default () => {
                 />
                 <Button
                     style={{marginBottom: 20}}
-                    icon={icons("Add", "white")}
+                    icon={globals.icon("Add", "white")}
                     type="solid"
                     onPress={addItem}
                 />
@@ -103,7 +96,7 @@ export default () => {
                                 }}>
                                 <Text>{item.subject}</Text>
                                 <Button
-                                    icon={icons("Remove", "black", 10)}
+                                    icon={globals.icon("Remove", "black", 10)}
                                     type="outline"
                                     onPress={() => removeItem(index)}
                                 />
@@ -111,8 +104,9 @@ export default () => {
                         )
                     })
                 }
+                <Card.Divider/>
+                <Button title="SUBMIT" onPress={confirm}/>
             </Card>
-            <Button title="SUBMIT" onPress={confirm}/>
-        </View>
+        </ScrollView>
     )
 }

@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import {Button, Card, Input} from 'react-native-elements'
 import {Alert, View} from "react-native";
 import axios from "axios";
-import globals from "~/globals"
 import {useNavigation} from "@react-navigation/native";
 
 
@@ -42,15 +41,10 @@ export default () => {
             "submit?",
             [{text: "Cancel"}, {
                 text: "Ok", onPress: () => {
-                    let url = `${globals.API_URL}/auth/join`
-                    axios.post(url, join)
-                        .then(res => {
-                            Alert.alert("success")
-                            navigation.goBack()
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
+                    axios.post(`/auth/join`, join).then(res => {
+                        Alert.alert("success")
+                        navigation.goBack()
+                    }).catch(() => Alert.alert("error"))
                 }
             }]
         )

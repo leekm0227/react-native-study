@@ -26,17 +26,11 @@ export default () => {
             return
         }
 
-        let url = `${globals.API_URL}/auth/login`
-        axios.post(url, {email: email, password: pwd})
-            .then(res => {
-                dispatch({type: userUpdate, payload: res.data.data})
-                asyncStorage.setItem(globals.KEY_AUTH_TOKEN, res.data.data.token)
-                navigation.navigate("home")
-            })
-            .catch(err => {
-                console.log(err)
-                alert("login error")
-            })
+        axios.post(`/auth/login`, {email: email, password: pwd}).then(res => {
+            dispatch({type: userUpdate, payload: res.data})
+            asyncStorage.setItem(globals.KEY_AUTH_TOKEN, res.data.token)
+            navigation.navigate("home")
+        }).catch(() => Alert.alert("error"))
     }
 
     return (
@@ -45,7 +39,7 @@ export default () => {
                 <Input label="EMAIL" textContentType="emailAddress" onChangeText={text => setEmail(text)}/>
                 <Input label="PASSWORD" secureTextEntry={true} onChangeText={text => setPwd(text)}/>
                 <Card.Divider/>
-                <Button title="LOGIN" style={{marginBottom: 15}} onPress={login}/>
+                <Button title="LOGIN" buttonStyle={{marginBottom: 15}} onPress={login}/>
                 <Button title="JOIN" type="outline" onPress={() => navigation.navigate("join")}/>
             </Card>
         </View>

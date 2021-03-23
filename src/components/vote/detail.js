@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {Alert, View} from 'react-native';
 import {Button, Card, Text} from 'react-native-elements'
-import icons from "~/components/icons";
 import axios from "axios"
 import {useDispatch, useSelector} from "react-redux";
 import {useRoute} from "@react-navigation/native";
@@ -10,7 +9,7 @@ import {userTicketDecrease} from "~/redux/action"
 
 
 export default () => {
-    const user = useSelector(store => store.user)
+    const user = useSelector(store => store.userReducer)
     const dispatch = useDispatch()
     const route = useRoute()
     let [isLoading, setIsLoading] = useState(false)
@@ -18,22 +17,23 @@ export default () => {
 
     const voteItem = (voteId, itemId) => {
         if (isLoading) return
-        if (user.ticket === 0) {
+
+        if (!user.token) {
+            Alert.alert("need login")
+            return
+        }
+
+        if (user.ticket < 1) {
             Alert.alert("not enough ticket")
             return
         }
 
-        let url = `${globals.API_URL}/votes/${voteId}/items/${itemId}`
-        axios.post(url, {}, {headers: {Authorization: user.token}})
-            .then(res => {
-                setVote(res.data.data)
-                setIsLoading(false)
-                dispatch({type: userTicketDecrease, payload: 1})
-                Alert.alert("success")
-            })
-            .catch(err => {
-                console.log(err)
-            })
+        axios.post(`/votes/${voteId}/items/${itemId}`).then(res => {
+            setVote(res.data)
+            setIsLoading(false)
+            dispatch({type: userTicketDecrease, payload: 1})
+            Alert.alert("success")
+        }).catch(() => Alert.alert("error"))
     }
 
     return (
@@ -61,7 +61,7 @@ export default () => {
                                 justifyContent: 'space-between'
                             }}>
                                 <Text style={{marginRight: 10}}>{item.count}</Text>
-                                <Button icon={icons("Add", "black", 10)}
+                                <Button icon={globals.icon("Add", "black", 10)}
                                         type="outline"
                                         onPress={() => voteItem(vote.voteId, item.itemId)}
                                 />

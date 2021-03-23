@@ -2,23 +2,49 @@ import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import VoteStackNavigator from "~/navigators/VoteStackNavigator";
 import HomeStackNavigator from "~/navigators/HomeStackNavigator";
-import icons from "~/components/icons";
+import axios from "axios";
+import asyncStorage from "@react-native-community/async-storage";
+import globals from "~/globals"
+import {userUpdate} from "~/redux/action"
+import {useDispatch} from "react-redux";
 
-const Tab = createBottomTabNavigator();
-export default () => (
-    <Tab.Navigator
-        screenOptions={({route}) => ({
-            tabBarIcon: ({color, size}) => (icons(route.name, color, size))
-        })}
-        tabBarOptions={{
-            activeTintColor: 'black',
-            inactiveTintColor: 'gray',
-            style: {
-                backgroundColor: 'white',
-            }
-        }}
-    >
-        <Tab.Screen name="Home" component={HomeStackNavigator}/>
-        <Tab.Screen name="Vote" component={VoteStackNavigator}/>
-    </Tab.Navigator>
-)
+
+export default () => {
+    const Tab = createBottomTabNavigator();
+    const dispatch = useDispatch()
+    const localhost = Platform.OS === 'android' ? "http://10.0.2.2:8080" : "http://localhost:8080"
+
+    // axios setting
+    axios.defaults.baseURL = globals.DEBUG ? localhost : "http://140.238.3.159:8080"
+    axios.interceptors.response.use((res) => res.data, (err) => {
+        console.log(err)
+        return Promise.reject(err)
+    })
+
+    // valid token
+    asyncStorage.getItem(globals.KEY_AUTH_TOKEN).then((token) => {
+        if (!token) return
+        axios.get(`/auth/info`, {headers: {Authorization: token}}).then(res => {
+            dispatch({type: userUpdate, payload: res.data})
+            axios.defaults.headers.common['Authorization'] = token
+        }).catch(() => console.log("invalid token"))
+    })
+
+    return (
+        <Tab.Navigator
+            screenOptions={({route}) => ({
+                tabBarIcon: ({color, size}) => (globals.icon(route.name, color, size))
+            })}
+            tabBarOptions={{
+                activeTintColor: 'black',
+                inactiveTintColor: 'gray',
+                style: {
+                    backgroundColor: 'white',
+                }
+            }}
+        >
+            <Tab.Screen name="Home" component={HomeStackNavigator}/>
+            <Tab.Screen name="Vote" component={VoteStackNavigator}/>
+        </Tab.Navigator>
+    )
+}

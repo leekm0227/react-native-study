@@ -5,12 +5,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import {navigationRef} from '~/navigators/RootNavigation'
 import BottomTabNavigator from '~/navigators/BottomTabNavigator'
 
-const api = "http://localhost:8080"
 
-export default () => (
-    <Provider store={store}>
+export default () => {
+    return (
+        <Provider store={store}>
             <NavigationContainer ref={navigationRef}>
                 <BottomTabNavigator/>
             </NavigationContainer>
-    </Provider>
-);
+        </Provider>
+    )
+}

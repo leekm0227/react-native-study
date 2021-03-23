@@ -1,4 +1,4 @@
-import React, {useLayoutEffect} from "react";
+import React from "react";
 import List from "~/components/vote/list"
 import Add from "~/components/vote/add"
 import Detail from "~/components/vote/detail"

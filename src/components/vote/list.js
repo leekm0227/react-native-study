@@ -1,13 +1,14 @@
 import React, {useEffect, useLayoutEffect, useState} from "react";
 import {useNavigation} from '@react-navigation/native';
-import {FlatList, RefreshControl, TouchableOpacity} from 'react-native';
+import {Alert, FlatList, TouchableOpacity} from 'react-native';
 import {Button, Card, Text} from 'react-native-elements'
-import icons from "~/components/icons";
 import axios from "axios"
 import globals from "~/globals";
+import {useSelector} from "react-redux";
 
 
 export default () => {
+    const user = useSelector(store => store.userReducer)
     const size = globals.DEFAULT_SIZE
     let refresh = false
     let [isLoading, setIsLoading] = useState(false)
@@ -18,9 +19,16 @@ export default () => {
         navigation.setOptions({
             headerRight: () => (
                 <Button
-                    icon={icons("Add")}
+                    icon={globals.icon("Add")}
                     type="clear"
-                    onPress={() => navigation.navigate("add")}/>
+                    onPress={() => {
+                        if(!user.token){
+                            Alert.alert("need login");
+                            return
+                        }
+
+                        navigation.navigate("add")
+                    }}/>
             ),
         });
     }, [navigation]);
@@ -33,15 +41,13 @@ export default () => {
         if (isLoading) return
 
         let page = refresh ? 1 : votes.length / size + 1
-        let url = `${globals.API_URL}/votes?size=${size}&page=${page}`
-        axios.get(url)
-            .then(res => {
-                if (res.data.data != null) {
-                    setVotes(state => refresh ? res.data.data : state.concat(res.data.data))
-                    setIsLoading(false)
-                    refresh = false
-                }
-            })
+        axios.get(`/votes?size=${size}&page=${page}`).then(res => {
+            if (res.data != null) {
+                setVotes(state => refresh ? res.data : state.concat(res.data))
+                setIsLoading(false)
+                refresh = false
+            }
+        }).catch(() => Alert.alert("error"))
     }
 
     const renderItem = (props) => {

@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect} from "react";
+import React, {useLayoutEffect} from "react";
 import {Button, Card, Text} from 'react-native-elements'
 import {Alert, View} from "react-native";
 import {useDispatch, useSelector} from "react-redux";
@@ -7,30 +7,12 @@ import axios from "axios";
 import globals from "~/globals"
 import {userUpdate} from "~/redux/action"
 import asyncStorage from "@react-native-community/async-storage";
-import icons from "~/components/icons";
 
 
 export default () => {
-    const user = useSelector(store => store.user)
+    const user = useSelector(store => store.userReducer)
     const dispatch = useDispatch()
     const navigation = useNavigation();
-
-    useEffect(() => {
-        getInfo()
-    }, [])
-
-    const getInfo = () => {
-        asyncStorage.getItem(globals.KEY_AUTH_TOKEN).then((token) => {
-            if (token) {
-                let url = `${globals.API_URL}/auth/info`
-                axios.get(url, {headers: {Authorization: token}}).then(res => {
-                    dispatch({type: userUpdate, payload: res.data.data})
-                }).catch(err => {
-                    console.log(err)
-                })
-            }
-        })
-    }
 
     const logout = () => {
         Alert.alert(
@@ -38,11 +20,11 @@ export default () => {
             "logout?",
             [{text: "Cancel"}, {
                 text: "Ok", onPress: () => {
-                    let url = `${globals.API_URL}/auth/logout`
-                    axios.get(url, {headers: {Authorization: user.token}}).then(res => {
+                    axios.get(`/auth/logout`).then(res => {
                         asyncStorage.removeItem(globals.KEY_AUTH_TOKEN)
                         dispatch({type: userUpdate, payload: {}})
-                    })
+                        Alert.alert("success")
+                    }).catch(() => Alert.alert("error"))
                 }
             }]
         )
@@ -53,7 +35,7 @@ export default () => {
             headerRight: () => (
                 <Button
                     style={{marginRight: 15}}
-                    icon={icons(user.token ? "Logout" : "Login")}
+                    icon={globals.icon(user.token ? "Logout" : "Login")}
                     type="clear"
                     onPress={() => user.token ? logout() : navigation.navigate("login")}/>
             ),
