@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Alert, View} from 'react-native';
 import {Button, Card, Text} from 'react-native-elements'
 import axios from "axios"
@@ -14,6 +14,16 @@ export default () => {
     const route = useRoute()
     let [isLoading, setIsLoading] = useState(false)
     let [vote, setVote] = useState(route.params)
+
+    useEffect(() => {
+        getVote()
+    }, [])
+
+    const getVote = () => {
+        axios.get(`/votes/${vote.voteId}`)
+            .then(res => setVote(res.data))
+            .catch(() => Alert.alert("error"))
+    }
 
     const voteItem = (voteId, itemId) => {
         if (isLoading) return
@@ -43,7 +53,7 @@ export default () => {
             <Text style={{marginBottom: 10, minHeight: 200}}>{vote.content}</Text>
             <Card.Divider/>
             {
-                vote.voteItems.map((item) => {
+                vote.voteItems?.map((item) => {
                     return (
                         <View
                             key={item.itemId}

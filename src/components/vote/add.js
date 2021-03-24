@@ -83,7 +83,7 @@ export default () => {
                 />
                 <Card.Divider/>
                 {
-                    voteItems.map((item, index) => {
+                    voteItems?.map((item, index) => {
                         return (
                             <View
                                 key={index}
