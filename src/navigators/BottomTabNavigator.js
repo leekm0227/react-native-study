@@ -12,10 +12,9 @@ import {useDispatch} from "react-redux";
 export default () => {
     const Tab = createBottomTabNavigator();
     const dispatch = useDispatch()
-    const localhost = Platform.OS === 'android' ? "http://10.0.2.2:8080" : "http://localhost:8080"
 
     // axios setting
-    axios.defaults.baseURL = globals.DEBUG ? localhost : "http://140.238.3.159:8080"
+    axios.defaults.baseURL = globals.BASE_URL
     axios.interceptors.response.use((res) => res.data, (err) => {
         console.log(err)
         return Promise.reject(err)
