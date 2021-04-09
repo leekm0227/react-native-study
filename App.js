@@ -1,15 +1,23 @@
 import React from "react";
-import {Provider} from "react-redux";
-import {store} from "~/redux";
-import {NavigationContainer} from '@react-navigation/native';
-import {navigationRef} from '~/navigators/RootNavigation'
-import BottomTabNavigator from '~/navigators/BottomTabNavigator'
-
+import {StyleSheet, StatusBar} from "react-native";
+import {GameEngine} from "react-native-game-engine"
+import {MoveFinger} from "./src/system";
+import {Board} from "./src/renderers";
 
 export default () => (
-    <Provider store={store}>
-            <NavigationContainer ref={navigationRef}>
-                <BottomTabNavigator/>
-            </NavigationContainer>
-    </Provider>
-);
+    <GameEngine
+        style={styles.container}
+        systems={[MoveFinger]}
+        entities={{
+            1: {renderer: <Board/>},
+        }}>
+        <StatusBar hidden={true}/>
+    </GameEngine>
+)
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#FFF"
+    }
+});
