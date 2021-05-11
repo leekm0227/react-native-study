@@ -1,23 +1,15 @@
 import React from "react";
-import {StyleSheet, StatusBar} from "react-native";
-import {GameEngine} from "react-native-game-engine"
-import {MoveFinger} from "./src/system";
-import {Board} from "./src/renderers";
+import {Provider} from "react-redux";
+import {SafeAreaView} from "react-native"
+import {store} from "./src/redux"
+import Game from "./src/game"
 
 export default () => (
-    <GameEngine
-        style={styles.container}
-        systems={[MoveFinger]}
-        entities={{
-            1: {renderer: <Board/>},
-        }}>
-        <StatusBar hidden={true}/>
-    </GameEngine>
+    <Provider store={store}>
+        <SafeAreaView style={{flex: 1}}>
+            <Game/>
+        </SafeAreaView>
+    </Provider>
 )
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#FFF"
-    }
-});
+

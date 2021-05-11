@@ -27,7 +27,7 @@ const TileMap = (props) => {
 
 const styles = StyleSheet.create({
     tileMap: {
-        flex: 3,
+        flex: 4,
         padding: PADDING,
         justifyContent: "space-between",
         borderWidth: 1
