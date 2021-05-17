@@ -1,6 +1,7 @@
 import React from "react";
 import {StatusBar, StyleSheet, Text, View, Dimensions} from "react-native";
 import {GameEngine} from "react-native-game-engine";
+import Matter from "matter-js";
 import {System} from "./system";
 import {useSelector} from "react-redux";
 
@@ -10,7 +11,10 @@ const STATUS_HEIGHT = (PADDING * 2) + 20
 const ROWS = 7
 const COLS = 7
 const SIZE = (WIDTH - (PADDING * 2)) / COLS
-const BOARD_TOP_OFFSET = PADDING
+
+let engine = Matter.Engine.create({enableSleeping: false});
+let world = engine.world;
+world.gravity.y = 0.0;
 
 const Status = () => {
     const status = useSelector(store => store.statusReducer)
@@ -24,36 +28,39 @@ const Status = () => {
 }
 
 const Block = (props) => {
-    const x = props.position[0] - SIZE;
-    const y = props.position[1] - SIZE + BOARD_TOP_OFFSET;
+    const width = props.body.bounds.max.x - props.body.bounds.min.x;
+    const height = props.body.bounds.max.y - props.body.bounds.min.y;
+    const x = props.body.position.x - width;
+    const y = props.body.position.y - height;
 
     return (
-        <View style={[styles.block, {left: x, top: y}]}/>
-    )
-}
-
-const Player = (props) => {
-    const x = props.position[0] - SIZE;
-    const y = props.position[1] - SIZE + BOARD_TOP_OFFSET;
-
-    return (
-        <View style={[styles.player, {left: x, top: y}]}/>
+        <View style={{
+            width: width,
+            height: height,
+            left: x,
+            top: y,
+            borderColor: "white",
+            borderWidth: 1,
+            backgroundColor: "gray",
+            position: "absolute"
+        }}/>
     )
 }
 
 // position: left, top
 const Board = () => {
-    const player = {position: [SIZE * 5, SIZE * 5], renderer: Player}
+    // const player = {position: [SIZE * 5, SIZE * 5], renderer: Player}
     const blocks = new Array(ROWS * COLS).fill({});
     const setEntities = (blocks) => {
         let entities = {}
-        entities.player = player;
         blocks.map((block, id) => {
             let row = Math.floor(id / COLS) + 1
             let col = id % COLS + 1
-            entities[id] = {position: [SIZE * col, SIZE * row], renderer: Block}
+            blocks[id] = Matter.Bodies.rectangle(SIZE * col, SIZE * row, SIZE, SIZE)
+            entities[id] = {body: blocks[id], renderer: Block}
         })
 
+        entities.physics = {engine: engine, world: world}
         return entities
     }
 

@@ -1,6 +1,10 @@
-const System = (state, { touches }) => {
+import Matter from "matter-js";
+
+let mouse = Matter.MouseConstraint.create(engine, options)
+
+const System = (entities, { touches }) => {
     touches.map(t => {
-        console.log(t, state);
+        console.log(Matter.MouseConstraint.mouse)
     })
 
 
@@ -14,7 +18,7 @@ const System = (state, { touches }) => {
     //     }
     // });
 
-    return state;
+    return entities;
 };
 
 export { System };
